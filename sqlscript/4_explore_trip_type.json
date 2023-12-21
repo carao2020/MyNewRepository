@@ -5,12 +5,12 @@
 			"name": "nyc_taxi/discovery"
 		},
 		"content": {
-			"query": "",
+			"query": "USE nyc_taxi_discovery;\n\nSELECT * \nFROM OPENROWSET(\n    BULK 'trip_type.tsv',\n    DATA_SOURCE = 'nyc_taxi_data_raw',\n    FIELDTERMINATOR = '\\t',\n    FORMAT = 'CSV',\n    PARSER_VERSION = '2.0',\n    HEADER_ROW = TRUE\n)\nWITH(\n    trip_type SMALLINT,\n    trip_type_desc VARCHAR(30)\n)\nas trip_type",
 			"metadata": {
 				"language": "sql"
 			},
 			"currentConnection": {
-				"databaseName": "master",
+				"databaseName": "nyc_taxi_discovery",
 				"poolName": "Built-in"
 			},
 			"resultLimit": 5000
