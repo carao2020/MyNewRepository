@@ -257,12 +257,35 @@
 					"name": "nyc_taxi/discovery"
 				},
 				"content": {
-					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synapsecoursesaku2020dl.dfs.core.windows.net/nyc-taxi-data/raw/trip_data_green_csv/year=2020/month=01/green_tripdata_2020-01.csv',\n        DA\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0'\n    ) AS [result]\n",
+					"query": "USE nyc_taxi_discovery;\nSELECT\n    *\nFROM\n    OPENROWSET(\n        BULK ('trip_data_green_csv/year=2020/month=01',\n        'trip_data_green_csv/year=2020/month=03'),\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        ROWTERMINATOR = '\\n',\n        HEADER_ROW = TRUE\n    ) AS [result];\n\n\nSELECT\n    *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=*/month=*/*.csv',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        ROWTERMINATOR = '\\n',\n        HEADER_ROW = TRUE\n    ) AS [result];\n\n    -- Metadata functions\n\n    SELECT\n    result.filename() as file_name,\n    result.*\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=*/month=*/*.csv',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        ROWTERMINATOR = '\\n',\n        HEADER_ROW = TRUE\n    ) AS [result];\n\nSELECT\n    result.filename() as file_name,\n    count(1) as record_count\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=*/month=*/*.csv',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        ROWTERMINATOR = '\\n',\n        HEADER_ROW = TRUE\n    ) AS result\n    group by result.filename()\n    order by result.filename();\n\n    -- filter by filename\n\nSELECT\n    result.filename() as file_name,\n    count(1) as record_count\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=*/month=*/*.csv',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        ROWTERMINATOR = '\\n',\n        HEADER_ROW = TRUE\n    ) AS result\n    WHERE result.filename() in ('green_tripdata_2020-01.csv','green_tripdata_2020-02.csv')\n    group by result.filename()\n    order by result.filename();\n\n-- Metadata file_path\n\nSELECT\n    result.filepath() as file_path,\n    result.filepath(1) as year,\n    result.filepath(2) as month,\n    result.filename() as file_name,\n    count(1) as record_count\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=*/month=*/*.csv',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        ROWTERMINATOR = '\\n',\n        HEADER_ROW = TRUE\n    ) AS result\n    group by result.filepath(),result.filepath(1), result.filepath(2), result.filename()\n    order by result.filepath(),result.filepath(1), result.filepath(2),result.filename();\n\n    --use file_path in where clause\n\n\n    SELECT\n    result.filepath() as file_path,\n    result.filepath(1) as year,\n    result.filepath(2) as month,\n    result.filename() as file_name,\n    count(1) as record_count\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=*/month=*/*.csv',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        ROWTERMINATOR = '\\n',\n        HEADER_ROW = TRUE\n    ) AS result\n   -- where result.filepath(1) =2020 \n     --    and result.filepath(2) in ('06','07','08')\n    group by result.filepath(),result.filepath(1), result.filepath(2), result.filename()\n    order by result.filepath(),result.filepath(1), result.filepath(2),result.filename();\n\nSELECT\n    result.filepath() as file_path,\n    result.filename() as file_name,\n    count(1) as record_count\nFROM\n    OPENROWSET(\n        BULK ('trip_data_green_csv/year=2020/month=06/*.csv',\n        'trip_data_green_csv/year=2020/month=07/*.csv',\n        'trip_data_green_csv/year=2020/month=08/*.csv'\n        ),\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        ROWTERMINATOR = '\\n',\n        HEADER_ROW = TRUE\n    ) AS result\n   -- where result.filepath(1) =2020 \n     --    and result.filepath(2) in ('06','07','08')\n    group by result.filepath(), result.filename()\n    order by result.filepath(),result.filename();\n",
 					"metadata": {
 						"language": "sql"
 					},
 					"currentConnection": {
-						"databaseName": "master",
+						"databaseName": "nyc_taxi_discovery",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/8_explore_trip_data_green_parquet')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "nyc_taxi/discovery"
+				},
+				"content": {
+					"query": "-- This is auto-generated code\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'PARQUET'\n    ) AS result\n\n\n--Identify the inferred data types\n\nEXEC sp_describe_first_result_set N'SELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK ''trip_data_green_parquet/year=2020/month=01/'',\n        DATA_SOURCE = ''nyc_taxi_data_raw'',\n        FORMAT = ''PARQUET''\n    ) AS result';\n\n--Define columns and datatypes\nSELECT\n     *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'PARQUET'\n    ) \n    WITH(\n        VendorID INT,\n        lpep_pickup_datetime datetime2(7),\n        lpep_dropoff_datetime datetime2(7),\n        store_and_fwd_flag CHAR(1),\n        RatecodeID INT,\n        PULocationID INT,\n        DOLocationID INT,\n        passenger_count INT,\n        trip_distance FLOAT,\n        extra FLOAT,\n        mta_tax FLOAT,\n        trip_amount FLOAT,\n        tolls_amount FLOAT,\n        ehail_fee INT,\n        improvement_surcharge FLOAT,\n        total_amount FLOAT,\n        payment_type INT,\n        trip_type INT,\n        congestion_surcharge FLOAT\n    )\n    AS result;\n\nSELECT\n     *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'PARQUET'\n    ) \n    WITH(\n        trip_amount FLOAT,\n        trip_type INT,\n        congestion_surcharge FLOAT\n    )\n    AS result;\n\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "nyc_taxi_discovery",
 						"poolName": "Built-in"
 					},
 					"resultLimit": 5000
