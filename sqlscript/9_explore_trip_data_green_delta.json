@@ -1,0 +1,20 @@
+{
+	"name": "9_explore_trip_data_green_delta",
+	"properties": {
+		"folder": {
+			"name": "nyc_taxi/discovery"
+		},
+		"content": {
+			"query": "USE nyc_taxi_discovery;\nSELECT \n   TOP 100 *\n   FROM\n   OPENROWSET(\n    BULK 'trip_data_green_delta',\n    DATA_SOURCE = 'nyc_taxi_data_raw',\n    FORMAT = 'DELTA'\n   ) as trip_data;\n\nEXEC sp_describe_first_result_set N'SELECT \n   TOP 100 *\n   FROM\n   OPENROWSET(\n    BULK ''trip_data_green_delta'',\n    DATA_SOURCE = ''nyc_taxi_data_raw'',\n    FORMAT = ''DELTA''\n   ) as trip_data';\n\n-- Try querying sub folders\n\nSELECT \n   TOP 100 *\n   FROM\n   OPENROWSET(\n    BULK 'trip_data_green_delta/year=2020',\n    DATA_SOURCE = 'nyc_taxi_data_raw',\n    FORMAT = 'DELTA'\n   ) as trip_data;",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "nyc_taxi_discovery",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
