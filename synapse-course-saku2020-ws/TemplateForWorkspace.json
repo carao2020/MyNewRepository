@@ -134,6 +134,52 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/11_data_quality_checks')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "nyc_taxi/discovery"
+				},
+				"content": {
+					"query": "USE nyc_taxi_discovery;\n\n-- Identify any data quality issues in trip total amount\n\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'PARQUET'\n    ) AS result;\n\n\nSELECT\n    min(total_amount) as min_total_amount,\n    max(total_amount) as max_total_amount,\n    avg(total_amount) as avg_total_amount,\n    count(1) as total_number_of_records,\n    count(total_amount) as not_null_total_number_of_records\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'PARQUET'\n    ) AS result;\n\n    -- Find negative total amount record\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'PARQUET'\n    ) AS result\n    where total_amount<0;\n    \nSELECT\n    payment_type,\n    count(1) as number_of_records\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/',\n        DATA_SOURCE = 'nyc_taxi_data_raw',\n        FORMAT = 'PARQUET'\n    ) AS result\n    group by payment_type;\n    ",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "nyc_taxi_discovery",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/12_join_data')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "nyc_taxi/discovery"
+				},
+				"content": {
+					"query": "USE nyc_taxi_discovery;\n\n\nSELECT\n     taxi_zone.*,\n     trip_data.*\nFROM\n    OPENROWSET(\n                BULK 'trip_data_green_parquet/year=2020/month=01/*.parquet',\n                DATA_SOURCE = 'nyc_taxi_data_raw',\n                FORMAT = 'PARQUET'\n    ) \n    AS trip_data\n\n    JOIN\n\n    OPENROWSET(\n                BULK 'taxi_zone.csv',\n                DATA_SOURCE='nyc_taxi_data_raw',\n                FORMAT = 'CSV',\n                PARSER_VERSION = '2.0', \n                FIRSTROW=2\n            )\n            WITH(\n                location_id SMALLINT 1,\n                borough VARCHAR(15) 2,\n                zone VARCHAR(50) 3,\n                service_zone VARCHAR(15) 4\n            )\n            AS taxi_zone\n    ON trip_data.PULocationID=taxi_zone.location_id;\n\n\n    SELECT\n     taxi_zone.borough,\n     count(1) as number_of_trips\nFROM\n    OPENROWSET(\n                BULK 'trip_data_green_parquet/year=2020/month=01/*.parquet',\n                DATA_SOURCE = 'nyc_taxi_data_raw',\n                FORMAT = 'PARQUET'\n    ) \n    AS trip_data\n\n    JOIN\n\n    OPENROWSET(\n                BULK 'taxi_zone.csv',\n                DATA_SOURCE='nyc_taxi_data_raw',\n                FORMAT = 'CSV',\n                PARSER_VERSION = '2.0', \n                FIRSTROW=2\n            )\n            WITH(\n                location_id SMALLINT 1,\n                borough VARCHAR(15) 2,\n                zone VARCHAR(50) 3,\n                service_zone VARCHAR(15) 4\n            )\n            AS taxi_zone\n    ON trip_data.PULocationID=taxi_zone.location_id\n    group by taxi_zone.borough\n    order by taxi_zone.borough;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "nyc_taxi_discovery",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/1_explore_taxi_zone')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -352,29 +398,6 @@
 					},
 					"currentConnection": {
 						"databaseName": "demo",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/11_data_quality_checks')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"folder": {
-					"name": "nyc_taxi/discovery"
-				},
-				"content": {
-					"query": "",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "master",
 						"poolName": "Built-in"
 					},
 					"resultLimit": 5000
