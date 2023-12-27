@@ -7,6 +7,11 @@
 			"metadata": "Workspace name",
 			"defaultValue": "synapse-course-saku2020-ws"
 		},
+		"ls_serverless_sql_pool_db_nyc_taxi_ldw_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ls_serverless_sql_pool_db_nyc_taxi_ldw'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synapse-course-saku2020-ws-ondemand.sql.azuresynapse.net,1433;Initial Catalog=nyc_taxi_ldw"
+		},
 		"synapse-course-saku2020-ws-WorkspaceDefaultSqlServer_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'synapse-course-saku2020-ws-WorkspaceDefaultSqlServer'",
@@ -60,6 +65,43 @@
 								"enablePartitionDiscovery": false
 							}
 						}
+					},
+					{
+						"name": "Create Silver Taxi Zone",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "Delete silver taxi_zone folder",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "ls_serverless_sql_pool_db_nyc_taxi_ldw",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "IF OBJECT_ID('silver.taxi_zone') IS NOT NULL\n    DROP EXTERNAL TABLE silver.taxi_zone;"
+								},
+								{
+									"type": "Query",
+									"text": "CREATE EXTERNAL TABLE silver.taxi_zone\nWITH(\n    LOCATION='silver/taxi_zone',\n    DATA_SOURCE=nyc_taxi_src,\n    FILE_FORMAT=parquet_file_format\n)\nAS\nSELECT *\nFROM bronze.taxi_zone;"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
 					}
 				],
 				"policy": {
@@ -68,7 +110,8 @@
 				"annotations": []
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/datasets/ds_silver_taxi_zone')]"
+				"[concat(variables('workspaceId'), '/datasets/ds_silver_taxi_zone')]",
+				"[concat(variables('workspaceId'), '/linkedServices/ls_serverless_sql_pool_db_nyc_taxi_ldw')]"
 			]
 		},
 		{
@@ -125,6 +168,25 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ls_serverless_sql_pool_db_nyc_taxi_ldw')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('ls_serverless_sql_pool_db_nyc_taxi_ldw_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('workspaceName'), '/ls_synapsecourse_saku2020_dl')]",

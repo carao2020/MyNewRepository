@@ -5,6 +5,9 @@
 		"workspaceName": {
 			"value": "synapse-course-saku2020-ws"
 		},
+		"ls_serverless_sql_pool_db_nyc_taxi_ldw_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synapse-course-saku2020-ws-ondemand.sql.azuresynapse.net,1433;Initial Catalog=nyc_taxi_ldw"
+		},
 		"synapse-course-saku2020-ws-WorkspaceDefaultSqlServer_connectionString": {
 			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synapse-course-saku2020-ws.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
