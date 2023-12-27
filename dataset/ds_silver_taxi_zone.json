@@ -1,0 +1,37 @@
+{
+	"name": "ds_silver_taxi_zone",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_synapsecourse_saku2020_dl",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "silver/taxi_zone",
+				"fileSystem": "nyc-taxi-data"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "location_id",
+				"type": "INT_16"
+			},
+			{
+				"name": "borough",
+				"type": "UTF8"
+			},
+			{
+				"name": "zone",
+				"type": "UTF8"
+			},
+			{
+				"name": "service_zone",
+				"type": "UTF8"
+			}
+		]
+	}
+}
