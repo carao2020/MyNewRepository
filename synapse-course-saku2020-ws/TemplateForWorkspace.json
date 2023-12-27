@@ -464,7 +464,7 @@
 					"name": "nyc_taxi/ldw"
 				},
 				"content": {
-					"query": "USE nyc_taxi_ldw;\nGO\n\n--Create taxi_zone on silver schema using CETAS\nIF OBJECT_ID('silver.taxi_zone') IS NOT NULL\n    DROP EXTERNAL TABLE silver.taxi_zone\nGO\nCREATE EXTERNAL TABLE silver.taxi_zone\nWITH(\n    LOCATION='silver/taxi_zone',\n    DATA_SOURCE=nyc_taxi_src,\n    FILE_FORMAT=parquet_file_format\n)\nAS\nSELECT *\nFROM bronze.taxi_zone;\n\nSELECT * FROM silver.taxi_zone;",
+					"query": "USE nyc_taxi_ldw;\nGO\n\n--Create taxi_zone on silver schema using CETAS\nIF OBJECT_ID('silver.taxi_zone') IS NOT NULL\n    DROP EXTERNAL TABLE silver.taxi_zone\nGO\nCREATE EXTERNAL TABLE silver.taxi_zone\nWITH(\n    LOCATION='silver/taxi_zone',\n    DATA_SOURCE=nyc_taxi_src,\n    FILE_FORMAT=parquet_file_format\n)\nAS\nSELECT *\nFROM bronze.taxi_zone;\n\nSELECT * FROM silver.taxi_zone;\n",
 					"metadata": {
 						"language": "sql"
 					},
@@ -502,6 +502,29 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/7_create_silver_calendar')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "nyc_taxi/ldw"
+				},
+				"content": {
+					"query": "USE nyc_taxi_ldw;\nGO\n\n\n--Create calendar on silver schema using CETAS\nIF OBJECT_ID('silver.calendar') IS NOT NULL\n    DROP EXTERNAL TABLE silver.calendar\nGO\nCREATE EXTERNAL TABLE silver.calendar\nWITH(\n    LOCATION='silver/calendar',\n    DATA_SOURCE=nyc_taxi_src,\n    FILE_FORMAT=parquet_file_format\n)\nAS\nSELECT *\nFROM bronze.calendar;\n\nSELECT * FROM silver.calendar;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/7_explore_trip_data_green_csv')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -525,6 +548,29 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/8_create_silver_trip_type')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "nyc_taxi/ldw"
+				},
+				"content": {
+					"query": "USE nyc_taxi_ldw;\nGO\n\n--Create trip_type table on silver schema\n\nIF OBJECT_ID('silver.trip_type') IS NOT NULL\n    DROP EXTERNAL TABLE silver.trip_type\nGO\nCREATE EXTERNAL TABLE silver.trip_type\nWITH(\n    LOCATION='silver/trip_type',\n    DATA_SOURCE=nyc_taxi_src,\n    FILE_FORMAT=parquet_file_format\n)\nAS\nSELECT *\nFROM bronze.trip_type;\n\nSELECT * FROM silver.trip_type;\n",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "nyc_taxi_ldw",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/8_explore_trip_data_green_parquet')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -539,6 +585,29 @@
 					},
 					"currentConnection": {
 						"databaseName": "nyc_taxi_discovery",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/9_create_silver_vendor')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "nyc_taxi/ldw"
+				},
+				"content": {
+					"query": "USE nyc_taxi_ldw;\nGO\n\n--Create vendor table on silver schema\n\nIF OBJECT_ID('silver.vendor') IS NOT NULL\n    DROP EXTERNAL TABLE silver.vendor\nGO\nCREATE EXTERNAL TABLE silver.vendor\nWITH(\n    LOCATION='silver/vendor',\n    DATA_SOURCE=nyc_taxi_src,\n    FILE_FORMAT=parquet_file_format\n)\nAS\nSELECT *\nFROM bronze.vendor;\n\nSELECT * FROM silver.vendor;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "nyc_taxi_ldw",
 						"poolName": "Built-in"
 					},
 					"resultLimit": 5000
@@ -585,6 +654,23 @@
 						"poolName": "Built-in"
 					},
 					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/10_create_silver_rate_code')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "nyc_taxi/ldw"
+				},
+				"content": {
+					"metadata": {
+						"language": "sql"
+					}
 				},
 				"type": "SqlQuery"
 			},
