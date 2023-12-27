@@ -234,7 +234,7 @@
 					"name": "nyc_taxi/ldw"
 				},
 				"content": {
-					"query": "USE master\n\nCREATE DATABASE nyc_taxi_ldw\nGO\n\nALTER DATABASE nyc_taxi_ldw COLLATE Latin1_General_100_BIN2_UTF8;\nGO\n\nUSE nyc_taxi_ldw\nGO\n\nCREATE SCHEMA brone\nGO\nCREATE SCHEMA silver\nGO\nCREATE SCHEMA gold\nGO\n\n",
+					"query": "USE master\n\nCREATE DATABASE nyc_taxi_ldw\nGO\n\nALTER DATABASE nyc_taxi_ldw COLLATE Latin1_General_100_BIN2_UTF8;\nGO\n\nUSE nyc_taxi_ldw\nGO\n\nCREATE SCHEMA bronze\nGO\nCREATE SCHEMA silver\nGO\nCREATE SCHEMA gold\nGO\n\n",
 					"metadata": {
 						"language": "sql"
 					},
@@ -372,7 +372,7 @@
 					"name": "nyc_taxi/ldw"
 				},
 				"content": {
-					"query": "USE nyc_taxi_ldw;\n\n--create taxi_zone table\ncreate EXTERNAL TABLE brone.taxi_zone\n(\n    location_id SMALLINT ,\n    borough VARCHAR(15) ,\n    zone VARCHAR(50) ,\n    service_zone VARCHAR(15) \n)\nWITH (\n    LOCATION ='raw/taxi_zone.csv',\n    DATA_SOURCE=nyc_taxi_src,\n    FILE_FORMAT=csv_file_format\n)\n\nSELECT * from brone.taxi_zone;",
+					"query": "USE nyc_taxi_ldw;\n\n--create taxi_zone table\nIF OBJECT_ID('bronze.taxi_zone') IS NOT NULL\n    DROP EXTERNAL TABLE bronze.taxi_zone;\n\ncreate EXTERNAL TABLE bronze.taxi_zone\n(\n    location_id SMALLINT ,\n    borough VARCHAR(15) ,\n    zone VARCHAR(50) ,\n    service_zone VARCHAR(15) \n)\nWITH (\n    LOCATION ='raw/taxi_zone.csv',\n    DATA_SOURCE=nyc_taxi_src,\n    FILE_FORMAT=csv_file_format_pv1,\n    REJECT_VALUE = 10,\n    REJECTED_ROW_LOCATION = 'raw/rejections/taxi_zone'\n)\n\nSELECT * from bronze.taxi_zone;",
 					"metadata": {
 						"language": "sql"
 					},
