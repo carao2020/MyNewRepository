@@ -11,11 +11,11 @@
 		"bing-covid-19-data_sasUri": {
 			"value": ""
 		},
-		"synapse-course-saku2020-ws-WorkspaceDefaultStorage_properties_typeProperties_url": {
-			"value": "https://synapsecoursesaku2020dl.dfs.core.windows.net"
-		},
 		"ls_synapsecourse_saku2020_dl_properties_typeProperties_url": {
 			"value": "https://synapsecoursesaku2020dl.dfs.core.windows.net/"
+		},
+		"synapse-course-saku2020-ws-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://synapsecoursesaku2020dl.dfs.core.windows.net"
 		}
 	}
 }
