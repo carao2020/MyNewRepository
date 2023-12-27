@@ -364,7 +364,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/4_ create_external_table')]",
+			"name": "[concat(parameters('workspaceName'), '/4_ create_bronze_tables')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -372,7 +372,7 @@
 					"name": "nyc_taxi/ldw"
 				},
 				"content": {
-					"query": "USE nyc_taxi_ldw;\n\ncreate EXTERNAL TABLE brone.taxi_zone\n(\n    location_id SMALLINT ,\n    borough VARCHAR(15) ,\n    zone VARCHAR(50) ,\n    service_zone VARCHAR(15) \n)\nWITH (\n    LOCATION ='raw/taxi_zone.csv',\n    DATA_SOURCE=nyc_taxi_src,\n    FILE_FORMAT=csv_file_format\n\n)\n\nSELECT * from brone.taxi_zone;",
+					"query": "USE nyc_taxi_ldw;\n\n--create taxi_zone table\ncreate EXTERNAL TABLE brone.taxi_zone\n(\n    location_id SMALLINT ,\n    borough VARCHAR(15) ,\n    zone VARCHAR(50) ,\n    service_zone VARCHAR(15) \n)\nWITH (\n    LOCATION ='raw/taxi_zone.csv',\n    DATA_SOURCE=nyc_taxi_src,\n    FILE_FORMAT=csv_file_format\n)\n\nSELECT * from brone.taxi_zone;",
 					"metadata": {
 						"language": "sql"
 					},
