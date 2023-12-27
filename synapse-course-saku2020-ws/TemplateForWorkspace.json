@@ -280,7 +280,7 @@
 					"name": "nyc_taxi/ldw"
 				},
 				"content": {
-					"query": "USE nyc_taxi_ldw;\n\nCREATE EXTERNAL DATA SOURCE nyc_taxi_src\nWITH\n(\n    LOCATION = 'https://synapsecoursesaku2020dl.dfs.core.windows.net/nyc-taxi-data'\n);\n",
+					"query": "USE nyc_taxi_ldw;\n\nIF NOT EXISTS(select * from sys.external_data_sources where name='nyc_taxi_src')\n    CREATE EXTERNAL DATA SOURCE nyc_taxi_src\n    WITH\n    (\n        LOCATION = 'https://synapsecoursesaku2020dl.dfs.core.windows.net/nyc-taxi-data'\n    );\n",
 					"metadata": {
 						"language": "sql"
 					},
@@ -326,7 +326,7 @@
 					"name": "nyc_taxi/ldw"
 				},
 				"content": {
-					"query": "USE nyc_taxi_ldw;\n\nCREATE EXTERNAL FILE FORMAT csv_file_format\nWITH(\n\n    FORMAT_TYPE=DELIMITEDTEXT,\n    FORMAT_OPTIONS (\n\n        FIELD_TERMINATOR =',',\n        STRING_DELIMITER='\"',\n        FIRST_ROW=2,\n        USE_TYPE_DEFAULT=FALSE,\n        ENCODING ='UTF8',\n        PARSER_VERSION='2.0'\n\n    )\n)",
+					"query": "USE nyc_taxi_ldw;\n\n\nIF NOT EXISTS(select * from sys.external_file_formats where name='csv_file_format')\n    CREATE EXTERNAL FILE FORMAT csv_file_format\n    WITH(\n\n        FORMAT_TYPE=DELIMITEDTEXT,\n        FORMAT_OPTIONS (\n\n            FIELD_TERMINATOR =',',\n            STRING_DELIMITER='\"',\n            FIRST_ROW=2,\n            USE_TYPE_DEFAULT=FALSE,\n            ENCODING ='UTF8',\n            PARSER_VERSION='2.0'\n\n        )\n    );\n\nIF NOT EXISTS(select * from sys.external_file_formats where name='csv_file_format_pv1')\n    CREATE EXTERNAL FILE FORMAT csv_file_format_pv1\n    WITH(\n\n        FORMAT_TYPE=DELIMITEDTEXT,\n        FORMAT_OPTIONS (\n\n            FIELD_TERMINATOR =',',\n            STRING_DELIMITER='\"',\n            FIRST_ROW=2,\n            USE_TYPE_DEFAULT=FALSE,\n            ENCODING ='UTF8',\n            PARSER_VERSION='1.0'\n\n        )\n    );",
 					"metadata": {
 						"language": "sql"
 					},
