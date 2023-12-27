@@ -19,6 +19,10 @@
 		"synapse-course-saku2020-ws-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://synapsecoursesaku2020dl.dfs.core.windows.net"
+		},
+		"ls_synapsecourse_saku2020_dl_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://synapsecoursesaku2020dl.dfs.core.windows.net/"
 		}
 	},
 	"variables": {
@@ -865,6 +869,25 @@
 				"type": "SqlQuery"
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/ls_synapsecourse_saku2020_dl')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('ls_synapsecourse_saku2020_dl_properties_typeProperties_url')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
 		}
 	]
 }
