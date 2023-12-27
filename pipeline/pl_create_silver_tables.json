@@ -1,0 +1,79 @@
+{
+	"name": "pl_create_silver_tables",
+	"properties": {
+		"activities": [
+			{
+				"name": "Delete silver table folder",
+				"type": "Delete",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "ds_nyc_taxi_data_dynamic",
+						"type": "DatasetReference",
+						"parameters": {
+							"p_folder_path": {
+								"value": "@variables('v_folder_path')",
+								"type": "Expression"
+							}
+						}
+					},
+					"enableLogging": false,
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					}
+				}
+			},
+			{
+				"name": "Create silver table",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Delete silver table folder",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": {
+						"value": "@variables('v_usp_name')",
+						"type": "Expression"
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_serverless_sql_pool_db_nyc_taxi_ldw",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"variables": {
+			"v_folder_path": {
+				"type": "String",
+				"defaultValue": "silver/taxi_zone"
+			},
+			"v_usp_name": {
+				"type": "String",
+				"defaultValue": "silver.usp_silver_taxi_zone"
+			}
+		},
+		"annotations": []
+	}
+}
