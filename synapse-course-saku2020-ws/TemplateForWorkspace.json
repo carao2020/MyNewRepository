@@ -1864,76 +1864,34 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/pl_execute_all_pipelines_copy1')]",
-			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"name": "[concat(parameters('workspaceName'), '/tr_nyc_taxi_data_load')]",
+			"type": "Microsoft.Synapse/workspaces/triggers",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
-				"activities": [
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
 					{
-						"name": "Execute Create Silver Tables",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "pl_create_silver_tables",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "Execute Create TripData GreenPipeline",
-						"type": "ExecutePipeline",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "pl_create_silver_trip_data_green",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
-					},
-					{
-						"name": "Execute Gold TripData Green Pipeline",
-						"type": "ExecutePipeline",
-						"dependsOn": [
-							{
-								"activity": "Execute Create Silver Tables",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							},
-							{
-								"activity": "Execute Create TripData GreenPipeline",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"pipeline": {
-								"referenceName": "pl_create_gold_trip_data_green",
-								"type": "PipelineReference"
-							},
-							"waitOnCompletion": true,
-							"parameters": {}
-						}
+						"pipelineReference": {
+							"referenceName": "pl_execute_all_pipelines",
+							"type": "PipelineReference"
+						},
+						"parameters": {}
 					}
 				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"annotations": []
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Minute",
+						"interval": 15,
+						"startTime": "2023-12-28T16:43:00",
+						"endTime": "2023-12-29T17:00:00",
+						"timeZone": "India Standard Time"
+					}
+				}
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/pipelines/pl_create_silver_tables')]",
-				"[concat(variables('workspaceId'), '/pipelines/pl_create_silver_trip_data_green')]",
-				"[concat(variables('workspaceId'), '/pipelines/pl_create_gold_trip_data_green')]"
+				"[concat(variables('workspaceId'), '/pipelines/pl_execute_all_pipelines')]"
 			]
 		}
 	]
