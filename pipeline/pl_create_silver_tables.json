@@ -3,64 +3,78 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Delete silver table folder",
-				"type": "Delete",
+				"name": "For each folder path",
+				"type": "ForEach",
 				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataset": {
-						"referenceName": "ds_nyc_taxi_data_dynamic",
-						"type": "DatasetReference",
-						"parameters": {
-							"p_folder_path": {
-								"value": "@variables('v_folder_path')",
-								"type": "Expression"
+					"items": {
+						"value": "@variables('v_folder_path_usp_name_array')",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Delete silver table folder",
+							"type": "Delete",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "ds_nyc_taxi_data_dynamic",
+									"type": "DatasetReference",
+									"parameters": {
+										"p_folder_path": {
+											"value": "@item().folder_path",
+											"type": "Expression"
+										}
+									}
+								},
+								"enableLogging": false,
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								}
+							}
+						},
+						{
+							"name": "Create silver table",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Delete silver table folder",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": {
+									"value": "@item().usp_name",
+									"type": "Expression"
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ls_serverless_sql_pool_db_nyc_taxi_ldw",
+								"type": "LinkedServiceReference"
 							}
 						}
-					},
-					"enableLogging": false,
-					"storeSettings": {
-						"type": "AzureBlobFSReadSettings",
-						"recursive": true,
-						"enablePartitionDiscovery": false
-					}
-				}
-			},
-			{
-				"name": "Create silver table",
-				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "Delete silver table folder",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"storedProcedureName": {
-						"value": "@variables('v_usp_name')",
-						"type": "Expression"
-					}
-				},
-				"linkedServiceName": {
-					"referenceName": "ls_serverless_sql_pool_db_nyc_taxi_ldw",
-					"type": "LinkedServiceReference"
+					]
 				}
 			}
 		],
@@ -72,6 +86,39 @@
 			"v_usp_name": {
 				"type": "String",
 				"defaultValue": "silver.usp_silver_taxi_zone"
+			},
+			"v_folder_path_usp_name_array": {
+				"type": "Array",
+				"defaultValue": [
+					{
+						"folder_path": "silver/calendar",
+						"usp_name": "silver.usp_silver_calendar"
+					},
+					{
+						"folder_path": "silver/calendar",
+						"usp_name": "silver.usp_silver_calendar"
+					},
+					{
+						"folder_path": "silver/tax_zone",
+						"usp_name": "silver.usp_silver_tax_zone"
+					},
+					{
+						"folder_path": "silver/trip_type",
+						"usp_name": "silver.usp_silver_trip_type"
+					},
+					{
+						"folder_path": "silver/vendor",
+						"usp_name": "silver.usp_silver_vendor"
+					},
+					{
+						"folder_path": "silver/rate_code",
+						"usp_name": "silver.usp_silver_rate_code"
+					},
+					{
+						"folder_path": "silver/payment_type",
+						"usp_name": "silver.usp_silver_payment_type"
+					}
+				]
 			}
 		},
 		"annotations": []
