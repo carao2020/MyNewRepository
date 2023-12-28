@@ -224,6 +224,55 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/pl_create_gold_trip_data_green_agg')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "Create Gold Trip data Green Agg",
+						"type": "SynapseNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": "1_spark_create_gold_trip_data_green_agg",
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": "coursepool",
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Small",
+							"conf": {
+								"spark.dynamicAllocation.enabled": null,
+								"spark.dynamicAllocation.minExecutors": null,
+								"spark.dynamicAllocation.maxExecutors": null
+							},
+							"driverSize": "Small",
+							"numExecutors": null
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/notebooks/1_spark_create_gold_trip_data_green_agg')]",
+				"[concat(variables('workspaceId'), '/bigDataPools/coursepool')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/pl_create_silver_tables')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
@@ -1924,7 +1973,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "a0724564-1005-48cf-9da0-4d5538d3583e"
+						"spark.autotune.trackingId": "5da5cafe-1dd6-4b67-80c6-1e5cc1de84d3"
 					}
 				},
 				"metadata": {
@@ -1949,8 +1998,7 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 10,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 5
 				},
@@ -2025,12 +2073,12 @@
 						"source": [
 							"# Set the folder paths so that it can be used later.\n",
 							"\n",
-							"bronze_flder_path = 'abfss://nyc-taxi-data@synapsecoursesaku2020dl.dfs.core.windiws.net/raw'\n",
-							"silver_flder_path = 'abfss://nyc-taxi-data@synapsecoursesaku2020dl.dfs.core.windiws.net/silver'\n",
-							"gold_flder_path = 'abfss://nyc-taxi-data@synapsecoursesaku2020dl.dfs.core.windiws.net/gold'"
+							"bronze_flder_path = 'abfss://nyc-taxi-data@synapsecoursesaku2020dl.dfs.core.windows.net/raw'\n",
+							"silver_flder_path = 'abfss://nyc-taxi-data@synapsecoursesaku2020dl.dfs.core.windows.net/silver'\n",
+							"gold_flder_path = 'abfss://nyc-taxi-data@synapsecoursesaku2020dl.dfs.core.windows.net/gold'"
 						],
 						"outputs": [],
-						"execution_count": 1
+						"execution_count": 18
 					},
 					{
 						"cell_type": "code",
@@ -2051,7 +2099,7 @@
 							"spark.conf.set(\"spark.sql.sources.partitionColumnTypeInference.enabled\", \"false\")"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 19
 					},
 					{
 						"cell_type": "code",
@@ -2067,7 +2115,8 @@
 							},
 							"microsoft": {
 								"language": "sparksql"
-							}
+							},
+							"collapsed": false
 						},
 						"source": [
 							"%%sql\n",
@@ -2075,10 +2124,10 @@
 							"--Create database to which we are going to write the data\n",
 							"\n",
 							"CREATE DATABASE IF NOT EXISTS nyc_taxi_ldw_spark \n",
-							"--LOCATION  'https://nyc-taxi-data@synapsecoursesaku2020dl.dfs.core.windiws.net/gold';"
+							"LOCATION  'abfss://nyc-taxi-data@synapsecoursesaku2020dl.dfs.core.windows.net/gold';"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 22
 					},
 					{
 						"cell_type": "code",
@@ -2099,7 +2148,7 @@
 							"trip_data_green_df=spark.read.parquet(f\"{silver_flder_path}/trip_data_green\")"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 23
 					},
 					{
 						"cell_type": "code",
@@ -2127,7 +2176,7 @@
 							"                         round(sum(\"fare_amount\"),2).alias(\"total_fare_amount\"))"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 24
 					},
 					{
 						"cell_type": "code",
@@ -2148,7 +2197,7 @@
 							"trip_data_green_agg_df.write.mode(\"overwrite\").partitionBy(\"year\",\"month\").format(\"parquet\").saveAsTable(\"nyc_taxi_ldw_spark.trip_data_green_agg\")"
 						],
 						"outputs": [],
-						"execution_count": null
+						"execution_count": 25
 					}
 				]
 			},
