@@ -95,12 +95,8 @@
 						"usp_name": "silver.usp_silver_calendar"
 					},
 					{
-						"folder_path": "silver/calendar",
-						"usp_name": "silver.usp_silver_calendar"
-					},
-					{
 						"folder_path": "silver/tax_zone",
-						"usp_name": "silver.usp_silver_tax_zone"
+						"usp_name": "silver.usp_silver_taxi_zone"
 					},
 					{
 						"folder_path": "silver/trip_type",
