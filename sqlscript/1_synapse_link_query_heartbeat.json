@@ -5,7 +5,7 @@
 			"name": "nyc_taxi/synapse_link"
 		},
 		"content": {
-			"query": "IF (NOT EXISTS(SELECT * FROM sys.credentials WHERE name = 'synapse-course-cosmos-saku2020-db'))\n    CREATE CREDENTIAL [synapse-course-cosmos-saku2020-db]\n    WITH IDENTITY = 'SHARED ACCESS SIGNATURE', SECRET = '3OgalQyYbGPfmYz2ZQZR6Ik1jtudWXXfP9CLs2HtQhbtG3ga39RiWQxOfEttd67YdWwPl8tDsWXqACDbJ64z5Q=='\nGO\n\n\nSELECT TOP 100 *\nFROM OPENROWSET(​PROVIDER = 'CosmosDB',\n                CONNECTION = 'Account=synapse-course-cosmos-saku2020-db;Database=nyctaxidb',\n                OBJECT = 'Heartbeat',\n                SERVER_CREDENTIAL = 'synapse-course-cosmos-saku2020-db'\n) AS [Heartbeat]\n",
+			"query": "IF (NOT EXISTS(SELECT * FROM sys.credentials WHERE name = 'synapse-course-cosmos-saku2020-db'))\n    CREATE CREDENTIAL [synapse-course-cosmos-saku2020-db]\n    WITH IDENTITY = 'SHARED ACCESS SIGNATURE', SECRET = '3OgalQyYbGPfmYz2ZQZR6Ik1jtudWXXfP9CLs2HtQhbtG3ga39RiWQxOfEttd67YdWwPl8tDsWXqACDbJ64z5Q=='\nGO\n\n\nSELECT TOP 100 *\nFROM OPENROWSET(​PROVIDER = 'CosmosDB',\n                CONNECTION = 'Account=synapse-course-cosmos-saku2020-db;Database=nyctaxidb',\n                OBJECT = 'Heartbeat',\n                SERVER_CREDENTIAL = 'synapse-course-cosmos-saku2020-db'\n) AS [Heartbeat]\n\n\nCREATE CREDENTIAL my_credential\n WITH IDENTITY = 'SHARED ACCESS SIGNATURE',\n SECRET = '3OgalQyYbGPfmYz2ZQZR6Ik1jtudWXXfP9CLs2HtQhbtG3ga39RiWQxOfEttd67YdWwPl8tDsWXqACDbJ64z5Q==';\n\nSELECT *\nFROM OPENROWSET(​\n    PROVIDER = 'CosmosDB',\n    CONNECTION = 'Account=synapse-course-cosmos-saku2020-db;Database=nyctaxidb',\n    OBJECT = 'Heartbeat',\n     SERVER_CREDENTIAL = 'my_credential') AS products_data",
 			"metadata": {
 				"language": "sql"
 			},
